@@ -38,6 +38,6 @@ public class UserRepository : IUserRepository
     // Retrieves a user from the database based on their unique identifier (ID) asynchronously. It returns the user if found, or null if no user with the specified ID exists.
     public Task<User?> GetByIdAsync(Guid id) =>
 
-    // Uses Entity Framework Core to query the Users DbSet for a user with the specified ID. The FirstOrDefaultAsync method is used to return the first matching user or null if no match is found.
+    // Uses Entity Framework Core to query the Users DbSet for a user with the specified ID. The FirstOrDefaultAsync method is used to return the first matching user or null if no match is found..
     _context.Users.FirstOrDefaultAsync(u => u.Id == id);
 }
