@@ -23,7 +23,7 @@ public class AuthController : ControllerBase
 
     // Endpoint for user registration. Accepts a RegisterRequest and returns an AuthResponse.
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    public async Task<IActionResult> Register([FromBody] RegisterRequestDtos request)
     {
         var response = await _authService.RegisterAsync(request);
         return Ok(response);
@@ -31,7 +31,7 @@ public class AuthController : ControllerBase
 
     // Endpoint for user login. Accepts a LoginRequest and returns an AuthResponse.
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDtos request)
     {
         var response = await _authService.LoginAsync(request);
         return Ok(response);

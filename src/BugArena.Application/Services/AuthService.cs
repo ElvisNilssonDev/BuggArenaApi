@@ -33,7 +33,7 @@ public class AuthService
     }
 
     // Registers a new user and returns an authentication response with a JWT token.
-    public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
+    public async Task<AuthResponse> RegisterAsync(RegisterRequestDtos request)
     {
         if (await _userRepository.GetByEmailAsync(request.Email) is not null)
             throw new InvalidOperationException("Email is already in use.");
@@ -66,7 +66,7 @@ public class AuthService
     }
 
     // Authenticates a user based on their email and password, returning an authentication response with a JWT token if successful.
-    public async Task<AuthResponse> LoginAsync(LoginRequest request)
+    public async Task<AuthResponse> LoginAsync(LoginRequestDtos request)
     {
         // Retrieve the user by email from the database. If the user does not exist, throw an unauthorized access exception.
         var user = await _userRepository.GetByEmailAsync(request.Email)
