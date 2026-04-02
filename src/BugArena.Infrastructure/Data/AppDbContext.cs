@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BugArena.Infrastructure.Data;
 
-public sealed class AppDbContext : DbContext
+public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -11,7 +11,17 @@ public sealed class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(u => u.Id);
+            entity.Property(u => u.Id).ValueGeneratedOnAdd();
+            entity.HasIndex(u => u.Email).IsUnique();
+            entity.HasIndex(u => u.Username).IsUnique();
+            entity.Property(u => u.Email).IsRequired().HasMaxLength(256);
+            entity.Property(u => u.Username).IsRequired().HasMaxLength(50);
+            entity.Property(u => u.PasswordHash).IsRequired();
+            entity.Property(u => u.Role).IsRequired().HasMaxLength(20);
+            entity.Property(u => u.AvatarUrl).HasMaxLength(512);
+        });
     }
 }

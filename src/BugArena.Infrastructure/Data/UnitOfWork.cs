@@ -2,7 +2,7 @@
 
 namespace BugArena.Infrastructure.Data;
 
-public sealed class UnitOfWork : IUnitOfWork
+public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;
 
@@ -11,6 +11,5 @@ public sealed class UnitOfWork : IUnitOfWork
         _context = context;
     }
 
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        => _context.SaveChangesAsync(cancellationToken);
+    public Task<int> SaveChangesAsync() => _context.SaveChangesAsync();
 }

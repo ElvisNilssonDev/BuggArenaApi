@@ -1,7 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using BugArena.Application.DTOs.Auth;
 using BugArena.Application.Interfaces;
 using BugArena.Domain.Entities;
 using Microsoft.Extensions.Options;
@@ -9,44 +8,36 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace BugArena.Infrastructure.Services;
 
-public sealed class TokenService : ITokenService
+public class TokenService : ITokenService
 {
-    private readonly JwtSettings _jwtSettings;
+    private readonly JwtSettings _jwt;
 
-    public TokenService(IOptions<JwtSettings> jwtSettings)
+    public TokenService(IOptions<JwtSettings> jwt)
     {
-        _jwtSettings = jwtSettings.Value;
+        _jwt = jwt.Value;
     }
 
-    public AuthResponse CreateToken(User user)
+    public string GenerateToken(User user)
     {
-        var expiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes);
-
-        var claims = new List<Claim>
+        var claims = new[]
         {
-            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(JwtRegisteredClaimNames.UniqueName, user.Username),
-            new(JwtRegisteredClaimNames.Email, user.Email),
-            new(ClaimTypes.Role, user.Role),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
+            new Claim("role", user.Role),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _jwtSettings.Issuer,
-            audience: _jwtSettings.Audience,
+            issuer: _jwt.Issuer,
+            audience: _jwt.Audience,
             claims: claims,
-            expires: expiresAt,
-            signingCredentials: credentials);
+            expires: DateTime.UtcNow.AddMinutes(_jwt.ExpiryMinutes),
+            signingCredentials: creds);
 
-        return new AuthResponse(
-            new JwtSecurityTokenHandler().WriteToken(token),
-            expiresAt,
-            user.Id,
-            user.Username,
-            user.Email,
-            user.Role);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

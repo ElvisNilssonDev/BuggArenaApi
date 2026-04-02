@@ -1,67 +1,90 @@
-﻿using BugArena.Application.DTOs.Auth;
+﻿using BugArena.Application.DTOs.Users;
 using BugArena.Application.Interfaces;
 using BugArena.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace BugArena.Application.Services;
 
-public sealed class AuthService : IAuthService
+public class AuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IPasswordService _passwordService;
     private readonly ITokenService _tokenService;
+    private readonly IPasswordHasher<User> _passwordHasher;
 
     public AuthService(
         IUserRepository userRepository,
         IUnitOfWork unitOfWork,
-        IPasswordService passwordService,
-        ITokenService tokenService)
+        ITokenService tokenService,
+        IPasswordHasher<User> passwordHasher)
     {
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
-        _passwordService = passwordService;
         _tokenService = tokenService;
+        _passwordHasher = passwordHasher;
     }
 
-    public async Task<AuthResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
+    public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
-        var email = request.Email.Trim().ToLowerInvariant();
-        var username = request.Username.Trim();
-
-        if (await _userRepository.GetByEmailAsync(email, cancellationToken) is not null)
+        if (await _userRepository.GetByEmailAsync(request.Email) is not null)
             throw new InvalidOperationException("Email is already in use.");
 
-        if (await _userRepository.GetByUsernameAsync(username, cancellationToken) is not null)
+        if (await _userRepository.GetByUsernameAsync(request.Username) is not null)
             throw new InvalidOperationException("Username is already taken.");
 
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Username = username,
-            Email = email,
-            Role = "User",
-            CreatedAt = DateTime.UtcNow
+            Username = request.Username,
+            Email = request.Email,
         };
 
-        user.PasswordHash = _passwordService.HashPassword(user, request.Password);
+        user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
 
-        await _userRepository.AddAsync(user, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _userRepository.AddAsync(user);
+        await _unitOfWork.SaveChangesAsync();
 
-        return _tokenService.CreateToken(user);
+        return new AuthResponse
+        {
+            Token = _tokenService.GenerateToken(user),
+            Username = user.Username,
+            Email = user.Email,
+            Role = user.Role
+        };
     }
 
-    public async Task<AuthResponse?> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
+    public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
-        var email = request.Email.Trim().ToLowerInvariant();
-        var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
+        var user = await _userRepository.GetByEmailAsync(request.Email)
+            ?? throw new UnauthorizedAccessException("Invalid email or password.");
 
-        if (user is null)
-            return null;
+        var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+        if (result == PasswordVerificationResult.Failed)
+            throw new UnauthorizedAccessException("Invalid email or password.");
 
-        if (!_passwordService.VerifyPassword(user, user.PasswordHash, request.Password))
-            return null;
+        return new AuthResponse
+        {
+            Token = _tokenService.GenerateToken(user),
+            Username = user.Username,
+            Email = user.Email,
+            Role = user.Role
+        };
+    }
 
-        return _tokenService.CreateToken(user);
+    public async Task<UserProfileResponse> GetMeAsync(Guid userId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId)
+            ?? throw new UnauthorizedAccessException("User not found.");
+
+        return new UserProfileResponse
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            Role = user.Role,
+            TotalPoints = user.TotalPoints,
+            AvatarUrl = user.AvatarUrl,
+            CreatedAt = user.CreatedAt
+        };
     }
 }
