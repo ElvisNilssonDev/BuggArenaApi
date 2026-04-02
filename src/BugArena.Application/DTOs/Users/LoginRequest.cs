@@ -1,5 +1,6 @@
 ﻿namespace BugArena.Application.DTOs.Users;
 
+// DTO for user login requests, containing the email and password fields.
 public class LoginRequest
 {
     public string Email { get; set; } = string.Empty;

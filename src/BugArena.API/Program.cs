@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
 
+// Main entry point for the BugArena API application. Configures services, middleware, and the HTTP request pipeline.
 var builder = WebApplication.CreateBuilder(args);
 
 // ── JWT Config ─────────────────────────────────────────────────────────────
@@ -80,19 +81,33 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// ── Build App ───────────────────────────────────────────────────────────────
 var app = builder.Build();
+
 // ── Pipeline ───────────────────────────────────────────────────────────────
 app.UseMiddleware<ExceptionMiddleware>();
 
+// Aktivera Swagger och Swagger UI endast i utvecklingsmiljön för att underlätta API-dokumentation och testning.
 if (app.Environment.IsDevelopment())
 {
+    // Aktivera Swagger-mellanvaran för att generera API-dokumentation och Swagger UI för att tillhandahålla en interaktiv gränssnitt för att testa API-endpoints.
     app.UseSwagger();
+    
+    // Aktivera Swagger UI-mellanvaran för att tillhandahålla en användarvänlig gränssnitt för att utforska och testa API-endpoints.
     app.UseSwaggerUI();
 }
 
+// Omdirigera alla HTTP-förfrågningar till HTTPS för att säkerställa att kommunikationen är krypterad.
 app.UseHttpsRedirection();
+
+// Aktivera autentisering och auktorisering i middleware-pipelinen för att skydda API-endpoints.
 app.UseAuthentication();
+
+// Aktivera auktorisering så att endast autentiserade användare kan få åtkomst till skyddade resurser.
 app.UseAuthorization();
+
+// Mappa controller-rutter så att API-endpoints kan nås via HTTP-förfrågningar.
 app.MapControllers();
 
+// ── Run App ───────────────────────────────────────────────────────────────
 app.Run();

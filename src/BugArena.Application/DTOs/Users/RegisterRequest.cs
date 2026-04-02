@@ -1,5 +1,6 @@
 ﻿namespace BugArena.Application.DTOs.Users;
 
+// DTO for user registration requests, containing the username, email, and password fields.
 public class RegisterRequest
 {
     public string Username { get; set; } = string.Empty;

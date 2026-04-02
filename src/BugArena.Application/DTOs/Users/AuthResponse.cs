@@ -1,5 +1,6 @@
 ﻿namespace BugArena.Application.DTOs.Users;
 
+// DTO for returning authentication response data, including the JWT token and user information.
 public class AuthResponse
 {
     public string Token { get; set; } = string.Empty;

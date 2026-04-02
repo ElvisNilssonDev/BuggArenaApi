@@ -6,17 +6,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BugArena.API.Controllers;
 
+// / Controller for handling user authentication and profile retrieval.
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
+
+    // Dependency injection of the AuthService to handle authentication logic.
     private readonly AuthService _authService;
 
+    // Constructor to initialize the AuthService.
     public AuthController(AuthService authService)
     {
         _authService = authService;
     }
 
+    // Endpoint for user registration. Accepts a RegisterRequest and returns an AuthResponse.
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -24,6 +29,7 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 
+    // Endpoint for user login. Accepts a LoginRequest and returns an AuthResponse.
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
@@ -31,6 +37,7 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 
+    // Endpoint to retrieve the authenticated user's profile information. Requires authorization.
     [HttpGet("me")]
     [Authorize]
     public async Task<IActionResult> Me()

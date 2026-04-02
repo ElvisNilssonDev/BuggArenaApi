@@ -1,5 +1,6 @@
 ﻿namespace BugArena.Domain.Entities;
 
+// Represents a user in the BugArena system.
 public class User
 {
     public Guid Id { get; set; }

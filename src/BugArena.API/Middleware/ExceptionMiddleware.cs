@@ -5,15 +5,18 @@ namespace BugArena.API.Middleware;
 
 public class ExceptionMiddleware
 {
+    // This middleware catches exceptions thrown during request processing and returns appropriate HTTP responses.
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionMiddleware> _logger;
 
+    // Constructor to initialize the middleware with the next delegate and a logger.
     public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
     {
         _next = next;
         _logger = logger;
     }
 
+    // The main method that gets called for each HTTP request. It tries to execute the next middleware and catches any exceptions.
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -35,6 +38,7 @@ public class ExceptionMiddleware
         }
     }
 
+    // Helper method to write a JSON response with the specified status code and error message.
     private static Task WriteResponse(HttpContext context, HttpStatusCode statusCode, string message)
     {
         context.Response.ContentType = "application/json";
