@@ -60,7 +60,7 @@ builder.Services.AddEndpointsApiExplorer();
 // ── Swagger ────────────────────────────────────────────────────────────────
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "BugArena API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Bug Arena", Version = "v1" });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -69,15 +69,13 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Klistra in din token: Bearer {token}"
+        Description = "Klistra in ditt token här"
     });
 
-    options.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
+    // NY syntax i Swashbuckle 10.x — tar emot document som parameter
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        {
-            new OpenApiSecuritySchemeReference("Bearer"),
-            new List<string>()
-        }
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
     });
 });
 
