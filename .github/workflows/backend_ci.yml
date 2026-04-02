@@ -2,28 +2,65 @@ name: Backend CI
 
 on:
   push:
-    branches: ["*"]
+    branches:
+      - '**'
   pull_request:
-    branches: ["*"]
-
+    branches:
+      - '**'
+ 
+env:
+  DOTNET_VERSION: '10.0.x'
+  SOLUTION_PATH: 'BuggArenaApi.sln'
+ 
 jobs:
   build-and-test:
+    name: Build & Test
     runs-on: ubuntu-latest
-
+ 
     steps:
-      - name: Checkout code
+      # ── Checkout ──
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup .NET
+ 
+      # ── Setup .NET ──
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "10.0.x"
-
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+ 
+      # ── Cache NuGet packages ──
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+ 
+      # ── Restore dependencies ──
       - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
-
-      - name: Run tests
-        run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+ 
+      # ── Build ──
+      - name: Build solution
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+ 
+      # ── Run tests ──
+      - name: Run unit tests
+        run: >
+          dotnet test ${{ env.SOLUTION_PATH }}
+          --configuration Release
+          --no-build
+          --verbosity normal
+          --logger "trx;LogFileName=test-results.trx"
+          --collect:"XPlat Code Coverage"
+          --results-directory ./test-results
+ 
+      # ── Upload test results ──
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: ./test-results
+          retention-days: 30
