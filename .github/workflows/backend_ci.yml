@@ -10,7 +10,7 @@ on:
  
 env:
   DOTNET_VERSION: '10.0.x'
-  SOLUTION_PATH: 'BuggArenaApi.sln'
+  SOLUTION_PATH: 'BuggArenaApi.slnx'
  
 jobs:
   build-and-test:
