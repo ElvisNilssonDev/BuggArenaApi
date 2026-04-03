@@ -1,6 +1,7 @@
 ﻿using BugArena.Application.DTOs.Challenges;
 using BugArena.Application.Interfaces;
 using BugArena.Domain.Entities;
+using BugArena.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace BugArena.Infrastructure.Repositories;

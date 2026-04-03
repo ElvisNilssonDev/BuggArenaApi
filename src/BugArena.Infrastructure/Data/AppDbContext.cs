@@ -1,6 +1,7 @@
 ﻿using BugArena.Domain.Entities;
-using BugArena.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+
+namespace BugArena.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {
