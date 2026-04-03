@@ -16,6 +16,7 @@ namespace BugArena.Domain.Entities
         public int PointsAwarded { get; set; } = 0;
         public int AttemptNumber { get; set; }
         public int TimeToSolveSeconds { get; set; }
+        public string? Feedback { get; set; }
         public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation
