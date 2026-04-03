@@ -1,6 +1,9 @@
 ﻿using BugArena.Application.DTOs.Challenges;
+using BugArena.Application.Interfaces;
 using BugArena.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+
+namespace BugArena.Infrastructure.Repositories;
 
 public class ChallengeRepository : IChallengeRepository
 {
@@ -15,6 +18,8 @@ public class ChallengeRepository : IChallengeRepository
     {
         var query = _context.Challenges
             .Include(c => c.Author)
+            .Include(c => c.Votes)
+            .Include(c => c.Solutions)
             .AsQueryable();
 
         if (queryParams.Language.HasValue)
@@ -28,6 +33,22 @@ public class ChallengeRepository : IChallengeRepository
 
         var skip = (queryParams.Page - 1) * queryParams.PageSize;
         return await query.Skip(skip).Take(queryParams.PageSize).ToListAsync();
+    }
+
+    public async Task<int> CountAsync(ChallengeQueryParams queryParams)
+    {
+        var query = _context.Challenges.AsQueryable();
+
+        if (queryParams.Language.HasValue)
+            query = query.Where(c => c.Language == queryParams.Language.Value);
+
+        if (queryParams.Difficulty.HasValue)
+            query = query.Where(c => c.Difficulty == queryParams.Difficulty.Value);
+
+        if (queryParams.Status.HasValue)
+            query = query.Where(c => c.Status == queryParams.Status.Value);
+
+        return await query.CountAsync();
     }
 
     public async Task<Challenge?> GetByIdAsync(Guid id)
