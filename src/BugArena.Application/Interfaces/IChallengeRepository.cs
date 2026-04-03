@@ -1,4 +1,7 @@
-﻿public interface IChallengeRepository
+﻿using BugArena.Application.DTOs.Challenges;
+using BugArena.Domain.Entities;
+
+public interface IChallengeRepository
 {
     Task<IEnumerable<Challenge>> GetAllAsync(ChallengeQueryParams queryParams);
     Task<Challenge?> GetByIdAsync(Guid id);
