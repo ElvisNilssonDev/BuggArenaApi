@@ -40,4 +40,10 @@ public class UserRepository : IUserRepository
 
     // Uses Entity Framework Core to query the Users DbSet for a user with the specified ID. The FirstOrDefaultAsync method is used to return the first matching user or null if no match is found..
     _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+    public Task UpdateAsync(User user)
+    {
+        _context.Users.Update(user);
+        return Task.CompletedTask;
+    }
 }
