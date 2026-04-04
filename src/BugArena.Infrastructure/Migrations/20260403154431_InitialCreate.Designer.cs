@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BugArena.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260402192830_AddAllModels")]
-    partial class AddAllModels
+    [Migration("20260403154431_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,13 +33,15 @@ namespace BugArena.Infrastructure.Migrations
 
                     b.Property<string>("ActualBehavior")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<Guid>("AuthorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BuggyCode")
                         .IsRequired()
+                        .HasMaxLength(50000)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ClosedAt")
@@ -50,29 +52,35 @@ namespace BugArena.Infrastructure.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
+                        .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Difficulty")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("ExpectedBehavior")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("Hints")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("Language")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("MaxPoints")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -82,6 +90,14 @@ namespace BugArena.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("Difficulty");
+
+                    b.HasIndex("Language");
+
+                    b.HasIndex("Status");
 
                     b.ToTable("Challenges");
                 });
@@ -100,10 +116,16 @@ namespace BugArena.Infrastructure.Migrations
 
                     b.Property<string>("Explanation")
                         .IsRequired()
+                        .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Feedback")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("FixedCode")
                         .IsRequired()
+                        .HasMaxLength(50000)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PointsAwarded")
@@ -114,7 +136,8 @@ namespace BugArena.Infrastructure.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime>("SubmittedAt")
                         .HasColumnType("datetime2");
@@ -127,6 +150,10 @@ namespace BugArena.Infrastructure.Migrations
                     b.HasIndex("ChallengeId");
 
                     b.HasIndex("SolverId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("ChallengeId", "SolverId");
 
                     b.ToTable("Solutions");
                 });
