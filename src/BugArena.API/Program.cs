@@ -33,10 +33,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<ISolutionRepository, SolutionRepository>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IChallengeRepository, ChallengeRepository>();
 builder.Services.AddScoped<ChallengeService>();
+builder.Services.AddScoped<SolutionService>();
+builder.Services.AddScoped<AuthService>();  
 
 // ── Authentication ─────────────────────────────────────────────────────────
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
