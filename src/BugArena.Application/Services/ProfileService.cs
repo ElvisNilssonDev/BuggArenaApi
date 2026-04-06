@@ -1,8 +1,4 @@
 ﻿using BugArena.Application.DTOs.Challenges;
-using BugArena.Application.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
-
-ususing BugArena.Application.DTOs.Challenges;
 using BugArena.Application.DTOs.Profile;
 using BugArena.Application.Interfaces;
 
@@ -78,3 +74,4 @@ public class ProfileService
         return new UserSolutionListResponse(items, totalCount, page, pageSize, totalPages);
     }
 }
+
