@@ -1,11 +1,13 @@
 using BugArena.API.Middleware;
 using BugArena.Application.Interfaces;
 using BugArena.Application.Services;
+using BugArena.Application.Validators;
 using BugArena.Domain.Entities;
 using BugArena.Infrastructure;
 using BugArena.Infrastructure.Data;
 using BugArena.Infrastructure.Repositories;
 using BugArena.Infrastructure.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +40,7 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IChallengeRepository, ChallengeRepository>();
 builder.Services.AddScoped<ChallengeService>();
 builder.Services.AddScoped<SolutionService>();
-builder.Services.AddScoped<AuthService>();  
+builder.Services.AddScoped<AuthService>();
 
 // ── Authentication ─────────────────────────────────────────────────────────
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -59,6 +61,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateChallengeValidator>();
 builder.Services.AddEndpointsApiExplorer();
 
 // ── Swagger ────────────────────────────────────────────────────────────────
