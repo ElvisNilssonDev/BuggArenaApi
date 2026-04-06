@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using BugArena.Application.DTOs.Solutions;
 using BugArena.Application.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +12,17 @@ namespace BugArena.API.Controllers;
 public class SolutionsController : ControllerBase
 {
     private readonly SolutionService _solutionService;
+    private readonly IValidator<SubmitSolutionRequest> _submitValidator;
+    private readonly IValidator<ReviewSolutionRequest> _reviewValidator;
 
-    public SolutionsController(SolutionService solutionService)
+    public SolutionsController(
+        SolutionService solutionService,
+        IValidator<SubmitSolutionRequest> submitValidator,
+        IValidator<ReviewSolutionRequest> reviewValidator)
     {
         _solutionService = solutionService;
+        _submitValidator = submitValidator;
+        _reviewValidator = reviewValidator;
     }
 
     // POST /api/challenges/{challengeId}/solutions
@@ -22,6 +30,10 @@ public class SolutionsController : ControllerBase
     [HttpPost("challenges/{challengeId}/solutions")]
     public async Task<IActionResult> Submit(Guid challengeId, [FromBody] SubmitSolutionRequest request)
     {
+        var validation = await _submitValidator.ValidateAsync(request);
+        if (!validation.IsValid)
+            return BadRequest(validation.Errors);
+
         try
         {
             var userId = GetUserId();
@@ -56,6 +68,10 @@ public class SolutionsController : ControllerBase
     [HttpPut("solutions/{id}/review")]
     public async Task<IActionResult> Review(Guid id, [FromBody] ReviewSolutionRequest request)
     {
+        var validation = await _reviewValidator.ValidateAsync(request);
+        if (!validation.IsValid)
+            return BadRequest(validation.Errors);
+
         try
         {
             var userId = GetUserId();

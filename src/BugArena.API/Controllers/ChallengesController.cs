@@ -1,5 +1,6 @@
 ﻿using BugArena.Application.DTOs.Challenges;
 using BugArena.Application.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -11,10 +12,17 @@ namespace BugArena.API.Controllers;
 public class ChallengesController : ControllerBase
 {
     private readonly ChallengeService _challengeService;
+    private readonly IValidator<CreateChallengeRequest> _createValidator;
+    private readonly IValidator<UpdateChallengeRequest> _updateValidator;
 
-    public ChallengesController(ChallengeService challengeService)
+    public ChallengesController(
+        ChallengeService challengeService,
+        IValidator<CreateChallengeRequest> createValidator,
+        IValidator<UpdateChallengeRequest> updateValidator)
     {
         _challengeService = challengeService;
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
     }
 
     // GET /api/challenges?language=CSharp&difficulty=Hard&page=1&pageSize=10
@@ -38,6 +46,10 @@ public class ChallengesController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Create([FromBody] CreateChallengeRequest dto)
     {
+        var validation = await _createValidator.ValidateAsync(dto);
+        if (!validation.IsValid)
+            return BadRequest(validation.Errors);
+
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var result = await _challengeService.CreateAsync(dto, userId);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
@@ -48,6 +60,10 @@ public class ChallengesController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateChallengeRequest dto)
     {
+        var validation = await _updateValidator.ValidateAsync(dto);
+        if (!validation.IsValid)
+            return BadRequest(validation.Errors);
+
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var updated = await _challengeService.UpdateAsync(id, dto, userId);
         return updated ? NoContent() : NotFound();
