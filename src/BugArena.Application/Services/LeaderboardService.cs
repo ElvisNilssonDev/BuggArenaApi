@@ -1,15 +1,18 @@
 ﻿using BugArena.Application.DTOs.Leaderboard;
 using BugArena.Application.Interfaces;
+using BugArena.Domain.Entities;
 
 namespace BugArena.Application.Services;
 
 public class LeaderboardService
 {
     private readonly ILeaderboardRepository _leaderboardRepo;
+    private readonly IUserRepository _userRepo;
 
-    public LeaderboardService(ILeaderboardRepository leaderboardRepo)
+    public LeaderboardService(ILeaderboardRepository leaderboardRepo, IUserRepository userRepo)
     {
         _leaderboardRepo = leaderboardRepo;
+        _userRepo = userRepo;   
     }
 
     public async Task<List<LeaderboardEntry>> GetGlobalAsync()
@@ -24,6 +27,12 @@ public class LeaderboardService
 
     public async Task<UserStatsResponse> GetUserStatsAsync(Guid userId)
     {
+        var user = await _userRepo.GetByIdAsync(userId);
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        };  
+
         var globalRank = await _leaderboardRepo.GetGlobalRankAsync(userId);
         var weeklyRank = await _leaderboardRepo.GetWeeklyRankAsync(userId);
         var weeklyPoints = await _leaderboardRepo.GetWeeklyPointsAsync(userId);
@@ -35,7 +44,7 @@ public class LeaderboardService
         return new UserStatsResponse(
             globalRank,
             weeklyRank,
-            0, // will be filled from user entity
+            user.TotalPoints,
             weeklyPoints,
             challengesSolved,
             challengesCreated,
