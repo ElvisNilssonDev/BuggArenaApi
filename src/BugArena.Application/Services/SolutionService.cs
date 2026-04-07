@@ -61,12 +61,12 @@ public class SolutionService
         return solutions.Select(MapToResponse).ToList();
     }
 
-    public async Task<SolutionResponse> ReviewAsync(Guid solutionId, ReviewSolutionRequest request, Guid reviewerId)
+    public async Task<SolutionResponse> ReviewAsync(Guid solutionId, ReviewSolutionRequest request, Guid reviewerId, string role)
     {
         var solution = await _solutionRepo.GetByIdWithDetailsAsync(solutionId)
             ?? throw new KeyNotFoundException($"Solution with ID '{solutionId}' was not found.");
 
-        if (solution.Challenge.AuthorId != reviewerId)
+        if (role != "Admin" && solution.Challenge.AuthorId != reviewerId)
             throw new UnauthorizedAccessException("Only the challenge author can review solutions.");
 
         if (solution.Status != SolutionStatus.Pending)
