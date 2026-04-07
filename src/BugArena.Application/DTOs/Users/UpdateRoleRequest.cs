@@ -1,3 +1,9 @@
-﻿namespace BugArena.Application.DTOs.Users;
+﻿using System.ComponentModel.DataAnnotations;
 
-public record UpdateRoleRequest(string Role);
+namespace BugArena.Application.DTOs.Users;
+
+public record UpdateRoleRequest(
+    [Required]
+    [RegularExpression("^(Admin|User)$", ErrorMessage = "Role must be either Admin or User.")]
+    string Role
+);

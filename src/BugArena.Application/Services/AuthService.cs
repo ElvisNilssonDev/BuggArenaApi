@@ -88,22 +88,22 @@ public class AuthService
     }
 
     // Retrieves the profile information of the currently authenticated user based on their user ID.
-    public async Task<UserProfileResponse> GetMeAsync(Guid userId)
+    public async Task<UserSummaryResponse> GetMeAsync(Guid userId)
     {
         //  Retrieve the user by ID from the database. If the user does not exist, throw an unauthorized access exception.
         var user = await _userRepository.GetByIdAsync(userId)
             ?? throw new UnauthorizedAccessException("User not found.");
 
-        // Map the user entity to a UserProfileResponse DTO and return it.
-        return new UserProfileResponse
-        {
-            Id = user.Id,
-            Username = user.Username,
-            Email = user.Email,
-            Role = user.Role,
-            TotalPoints = user.TotalPoints,
-            AvatarUrl = user.AvatarUrl,
-            CreatedAt = user.CreatedAt
-        };
+        // Map the user entity to a UserSummaryResponse DTO and return it.
+        return new UserSummaryResponse(
+            
+            user.Id,
+            user.Username,
+            user.Email,
+            user.Role,
+            user.TotalPoints,
+            user.AvatarUrl,
+            user.CreatedAt
+        );
     }
 }
