@@ -20,20 +20,20 @@ public class UserRepository : IUserRepository
     // Retrieves a user from the database based on their email address asynchronously. It returns the user if found, or null if no user with the specified email exists.
     public Task<User?> GetByEmailAsync(string email) =>
 
-        // Uses Entity Framework Core to query the Users DbSet for a user with the specified email. The FirstOrDefaultAsync method is used to return the first matching user or null if no match is found.
-        _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+    // Uses Entity Framework Core to query the Users DbSet for a user with the specified email. The FirstOrDefaultAsync method is used to return the first matching user or null if no match is found.
+    _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
     // Retrieves a user from the database based on their username asynchronously. It returns the user if found, or null if no user with the specified username exists.
     public Task<User?> GetByUsernameAsync(string username) =>
         
-        // Uses Entity Framework Core to query the Users DbSet for a user with the specified username. The FirstOrDefaultAsync method is used to return the first matching user or null if no match is found.
-        _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+    // Uses Entity Framework Core to query the Users DbSet for a user with the specified username. The FirstOrDefaultAsync method is used to return the first matching user or null if no match is found.
+     _context.Users.FirstOrDefaultAsync(u => u.Username == username);
 
     // Adds a new user to the database asynchronously. The method takes a User object as a parameter and adds it to the Users DbSet using the AddAsync method provided by Entity Framework Core.
     public async Task AddAsync(User user) =>
 
-        // Uses Entity Framework Core to add the provided User object to the Users DbSet. The AddAsync method is used to perform the operation asynchronously, allowing for efficient database interactions without blocking the calling thread.
-        await _context.Users.AddAsync(user);
+    // Uses Entity Framework Core to add the provided User object to the Users DbSet. The AddAsync method is used to perform the operation asynchronously, allowing for efficient database interactions without blocking the calling thread.
+    await _context.Users.AddAsync(user);
 
     // Retrieves a user from the database based on their unique identifier (ID) asynchronously. It returns the user if found, or null if no user with the specified ID exists.
     public Task<User?> GetByIdAsync(Guid id) =>
@@ -41,9 +41,38 @@ public class UserRepository : IUserRepository
     // Uses Entity Framework Core to query the Users DbSet for a user with the specified ID. The FirstOrDefaultAsync method is used to return the first matching user or null if no match is found..
     _context.Users.FirstOrDefaultAsync(u => u.Id == id);
 
+    // Updates an existing user in the database asynchronously.
     public Task UpdateAsync(User user)
     {
         _context.Users.Update(user);
         return Task.CompletedTask;
+    }
+
+    // Retrieves all users from the database asynchronously.
+    public async Task<IEnumerable<User>> GetAllAsync()
+    {
+        return await _context.Users.ToListAsync();
+    }
+
+    // Updates the role of a user in the database asynchronously.
+    public async Task<bool> UpdateRoleAsync(Guid id, string role)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user is null) return false;
+
+        user.Role = role;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    // Deletes a user from the database asynchronously.
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user is null) return false;
+
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }
