@@ -2,7 +2,6 @@
 
 namespace BugArena.Application.Interfaces;
 
-// Repository interface for managing user data, including retrieval by email, username, and ID, as well as adding new users.
 public interface IUserRepository
 {
     Task<User?> GetByEmailAsync(string email);
@@ -10,4 +9,7 @@ public interface IUserRepository
     Task<User?> GetByIdAsync(Guid id);
     Task AddAsync(User user);
     Task UpdateAsync(User user);
+    Task<List<User>> GetAllAsync();
+    Task<bool> UpdateRoleAsync(Guid id, string role);
+    Task<bool> DeleteAsync(Guid id);
 }

@@ -121,14 +121,27 @@ public class ChallengeService
         return true;
     }
 
-    public async Task<bool> DeleteAsync(Guid id, Guid requestingUserId)
+    public async Task<bool> DeleteAsync(Guid id, Guid requestingUserId, string role)
     {
         var challenge = await _challengeRepo.GetByIdAsync(id);
         if (challenge is null) return false;
-        if (challenge.AuthorId != requestingUserId)
+
+        if (role != "Admin" && challenge.AuthorId != requestingUserId)
             throw new UnauthorizedAccessException("You can only delete your own challenges.");
 
         await _challengeRepo.DeleteAsync(challenge);
+        await _unitOfWork.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> CloseAsync(Guid id)
+    {
+        var challenge = await _challengeRepo.GetByIdAsync(id);
+        if (challenge is null) return false;
+
+        challenge.Status = ChallengeStatus.Closed;
+        challenge.ClosedAt = DateTime.UtcNow;
+        await _challengeRepo.UpdateAsync(challenge);
         await _unitOfWork.SaveChangesAsync();
         return true;
     }

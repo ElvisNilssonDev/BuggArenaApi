@@ -75,7 +75,8 @@ public class SolutionsController : ControllerBase
         try
         {
             var userId = GetUserId();
-            var solution = await _solutionService.ReviewAsync(id, request, userId);
+            var role = User.FindFirstValue(ClaimTypes.Role) ?? "User";
+            var solution = await _solutionService.ReviewAsync(id, request, userId, role);
             return Ok(solution);
         }
         catch (KeyNotFoundException ex)

@@ -75,7 +75,17 @@ public class ChallengesController : ControllerBase
     public async Task<IActionResult> Delete(Guid id)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var deleted = await _challengeService.DeleteAsync(id, userId);
+        var role = User.FindFirstValue(ClaimTypes.Role) ?? "User";
+        var deleted = await _challengeService.DeleteAsync(id, userId, role);
         return deleted ? NoContent() : NotFound();
+    }
+
+    // PATCH /api/challenges/{id}/close
+    [HttpPatch("{id:guid}/close")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Close(Guid id)
+    {
+        var closed = await _challengeService.CloseAsync(id);
+        return closed ? NoContent() : NotFound();
     }
 }

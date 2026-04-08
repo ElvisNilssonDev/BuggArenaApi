@@ -35,8 +35,8 @@ public class TokenService : ITokenService
             // Standard JWT claim for the user's username.
             new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
 
-            // Custom claim for the user's role, which can be used for authorization purposes.
-            new Claim("role", user.Role),
+            // Custom claim for the user's role, which can be used for authorization purposes in the application.
+            new Claim(ClaimTypes.Role, user.Role),
 
             // Standard JWT claim for a unique identifier (JTI) to prevent token reuse.
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
