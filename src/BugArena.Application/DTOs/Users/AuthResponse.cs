@@ -3,6 +3,7 @@
 // DTO for returning authentication response data, including the JWT token and user information.
 public class AuthResponse
 {
+    public Guid Id { get; set; }
     public string Token { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
