@@ -58,6 +58,7 @@ public class AuthService
         // Generate a JWT token for the newly registered user and return the authentication response.
         return new AuthResponse
         {
+            Id = user.Id,
             Token = _tokenService.GenerateToken(user),
             Username = user.Username,
             Email = user.Email,
@@ -80,6 +81,7 @@ public class AuthService
         // Generate a JWT token for the authenticated user and return the authentication response.
         return new AuthResponse
         {
+            Id = user.Id,
             Token = _tokenService.GenerateToken(user),
             Username = user.Username,
             Email = user.Email,
