@@ -50,7 +50,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactDev", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -116,10 +116,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Omdirigera alla HTTP-förfrågningar till HTTPS för att säkerställa att kommunikationen är krypterad.
-app.UseHttpsRedirection();
-
 app.UseCors("AllowReactDev");
+
+// Omdirigera alla HTTP-förfrågningar till HTTPS för att säkerställa att kommunikationen är krypterad.
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // Aktivera autentisering och auktorisering i middleware-pipelinen för att skydda API-endpoints.
 app.UseAuthentication();
