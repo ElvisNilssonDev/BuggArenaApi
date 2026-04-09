@@ -116,10 +116,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Omdirigera alla HTTP-förfrågningar till HTTPS för att säkerställa att kommunikationen är krypterad.
-app.UseHttpsRedirection();
-
 app.UseCors("AllowReactDev");
+
+// Omdirigera alla HTTP-förfrågningar till HTTPS för att säkerställa att kommunikationen är krypterad.
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // Aktivera autentisering och auktorisering i middleware-pipelinen för att skydda API-endpoints.
 app.UseAuthentication();
