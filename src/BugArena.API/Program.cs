@@ -46,6 +46,16 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<LeaderboardService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactDev", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // ── Authentication ─────────────────────────────────────────────────────────
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -108,6 +118,8 @@ if (app.Environment.IsDevelopment())
 
 // Omdirigera alla HTTP-förfrågningar till HTTPS för att säkerställa att kommunikationen är krypterad.
 app.UseHttpsRedirection();
+
+app.UseCors("AllowReactDev");
 
 // Aktivera autentisering och auktorisering i middleware-pipelinen för att skydda API-endpoints.
 app.UseAuthentication();
