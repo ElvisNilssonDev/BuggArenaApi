@@ -124,7 +124,7 @@ common issues.
 
 <div align="center">
 
-### [📥 Download Installation Guide (.docx)](./BugArena-Installation-Guide.docx)
+### [📥 Download Installation Guide (.pdf)](https://github.com/ElvisNilssonDev/BugArena/raw/main/BugArena-Installation-Guide.pdf)
 
 </div>
 
@@ -133,5 +133,3 @@ common issues.
 <div align="center">
 
 Built with ☕ by Elvis & Benji and Hashi · 2026
-
-</div>
