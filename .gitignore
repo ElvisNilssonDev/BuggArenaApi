@@ -14,6 +14,15 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+# BugArena - Sensitive config
+appsettings.Development.json
+appsettings.Production.json
+
+# EF Core - Keep Migrations folder but ignore snapshots temp files
+*.db
+*.db-shm
+*.db-wal
+
 # Mono auto generated files
 mono_crash.*
 

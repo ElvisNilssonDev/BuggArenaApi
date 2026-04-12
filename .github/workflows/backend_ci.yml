@@ -1,0 +1,66 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+ 
+env:
+  DOTNET_VERSION: '10.0.x'
+  SOLUTION_PATH: 'BuggArenaApi.slnx'
+ 
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+ 
+    steps:
+      # ── Checkout ──
+      - name: Checkout repository
+        uses: actions/checkout@v5
+ 
+      # ── Setup .NET ──
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+ 
+      # ── Cache NuGet packages ──
+      - name: Cache NuGet packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+ 
+      # ── Restore dependencies ──
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+ 
+      # ── Build ──
+      - name: Build solution
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+ 
+      # # ── Run tests ──
+      # - name: Run unit tests
+      #   run: >
+      #     dotnet test ${{ env.SOLUTION_PATH }}
+      #     --configuration Release
+      #     --no-build
+      #     --verbosity normal
+      #     --logger "trx;LogFileName=test-results.trx"
+      #     --collect:"XPlat Code Coverage"
+      #     --results-directory ./test-results
+ 
+      # # ── Upload test results ──
+      # - name: Upload test results
+      #   uses: actions/upload-artifact@v4
+      #   if: always()
+      #   with:
+      #     name: test-results
+      #     path: ./test-results
+      #     retention-days: 30

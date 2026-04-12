@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BugArena.API/BugArena.API.csproj" />
+    <Project Path="src/BugArena.Application/BugArena.Application.csproj" />
+    <Project Path="src/BugArena.Domain/BugArena.Domain.csproj" />
+    <Project Path="src/BugArena.Infrastructure/BugArena.Infrastructure.csproj" />
+  </Folder>
+</Solution>
