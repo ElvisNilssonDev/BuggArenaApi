@@ -46,10 +46,36 @@ public class UserRepository : IUserRepository
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var user = await _context.Users.FindAsync(id);
+        var user = await _context.Users
+            .Include(u => u.Votes)
+            .Include(u => u.Solutions)
+            .Include(u => u.AuthoredChallenges)
+                .ThenInclude(c => c.Solutions)
+            .Include(u => u.AuthoredChallenges)
+                .ThenInclude(c => c.Votes)
+            .FirstOrDefaultAsync(u => u.Id == id);
+
         if (user is null) return false;
 
+        // Solutions på användarens egna challenges
+        foreach (var challenge in user.AuthoredChallenges)
+        {
+            _context.Solutions.RemoveRange(challenge.Solutions);
+            _context.Votes.RemoveRange(challenge.Votes);
+        }
+
+        // Användarens egna inlämnade solutions (som solver)
+        _context.Solutions.RemoveRange(user.Solutions);
+
+        // Användarens votes
+        _context.Votes.RemoveRange(user.Votes);
+
+        // Challenges
+        _context.Challenges.RemoveRange(user.AuthoredChallenges);
+
+        // User
         _context.Users.Remove(user);
+
         return true;
     }
 }
